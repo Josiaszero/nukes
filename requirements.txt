@@ -1,0 +1,7 @@
+matplotlib
+streamlit
+pandas
+tempfile
+streamlit_folium
+seaborn
+xlsxwriter
