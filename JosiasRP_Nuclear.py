@@ -2,7 +2,7 @@
 Name: Josias Rodriguez-Ponde
 CS230: Section 6
 Data: Nuclear Explosions 1945 - 1998
-URL: Link to your web application on Streamlit Cloud (if posted)
+URL: jrp-nukes-data.streamlit.app
 
 Description: This program is Streamlit-based application designed to allow users to explore nuclear
 explosion data. It allows users to analyze various fields of the dataset, including visualizing explosion locations on
@@ -24,55 +24,60 @@ df_nuke = pd.read_csv('nuclear_explosions.csv')
 df_nuke.drop_duplicates(inplace=True)
 
 # Making column names easier to type + useable with certain functions [DA1 + drop dupes above]
-df_nuke = df_nuke.rename(columns={'WEAPON_SOURCE': 'country',
-    'LOCATION': 'location',
-    'Data.Source': 'data_source',
-    'latitude': 'latitude',
-    'longitude': 'longitude',
-    'Data.Magnitude.Body': 'magnitude_body',
-    'Data.Magnitude.Surface': 'magnitude_surface',
-    'Location.Cordinates.Depth': 'depth',
-    'Data.Yeild.Lower': 'yield_lower',
-    'Data.Yeild.Upper': 'yield_upper',
-    'Data.Purpose': 'purpose',
-    'Data.Name': 'name',
-    'Data.Type': 'type',
-    'Date.Day': 'day',
-    'Date.Month': 'month',
-    'Date.Year': 'year'})
+df_nuke = df_nuke.rename(columns={
+                                    'WEAPON_SOURCE': 'country',
+                                    'LOCATION': 'location',
+                                    'Data.Source': 'data_source',
+                                    'latitude': 'latitude',
+                                    'longitude': 'longitude',
+                                    'Data.Magnitude.Body': 'magnitude_body',
+                                    'Data.Magnitude.Surface': 'magnitude_surface',
+                                    'Location.Cordinates.Depth': 'depth',
+                                    'Data.Yeild.Lower': 'yield_lower',
+                                    'Data.Yeild.Upper': 'yield_upper',
+                                    'Data.Purpose': 'purpose',
+                                    'Data.Name': 'name',
+                                    'Data.Type': 'type',
+                                    'Date.Day': 'day',
+                                    'Date.Month': 'month',
+                                    'Date.Year': 'year'})
 
 # Dictionary of user-friendly column names for later use
-column_usf = {'country': 'Country',
-    'location': 'Location',
-    'data_source': 'Data Source',
-    'latitude': 'Latitude',
-    'longitude': 'Longitude',
-    'magnitude_body': 'Magnitude (Body)',
-    'magnitude_surface': 'Magnitude (Surface)',
-    'depth': 'Depth',
-    'yield_lower': 'Yield (Lower)',
-    'yield_upper': 'Yield (Upper)',
-    'purpose': 'Purpose',
-    'name': 'Name',
-    'type': 'Type',
-    'day': 'Day',
-    'month': 'Month',
-    'year': 'Year'}
+column_usf = {
+                'country': 'Country',
+                'location': 'Location',
+                'data_source': 'Data Source',
+                'latitude': 'Latitude',
+                'longitude': 'Longitude',
+                'magnitude_body': 'Magnitude (Body)',
+                'magnitude_surface': 'Magnitude (Surface)',
+                'depth': 'Depth',
+                'yield_lower': 'Yield (Lower)',
+                'yield_upper': 'Yield (Upper)',
+                'purpose': 'Purpose',
+                'name': 'Name',
+                'type': 'Type',
+                'day': 'Day',
+                'month': 'Month',
+                'year': 'Year'}
+
 
 # Goes through a field/column and finds all unique values for that field and counts its frequency
-def find_unique_values(data, field): # [PY3] [DA1 / DA4, fucntion for filtering/maniupulating data]
+def find_unique_values(data, field):  # [PY3] [DA1 / DA4, function for filtering/manipulating data]
     unique_values = {}
-    unique_list = [val for val in data[field].unique()] # [PY4]
-    unique_values = data[field].value_counts().to_dict() # [DA9]
-    return unique_list, unique_values # [PY2]
+    unique_list = [val for val in data[field].unique()]  # [PY4]
+    unique_values = data[field].value_counts().to_dict()
+    return unique_list, unique_values  # [PY2]
 
 # Runs the function for all columns
 unique_data = {}
+
 for col in df_nuke.columns:
     unique_list, unique_values = find_unique_values(df_nuke, col)
     unique_data[col] = (unique_list, unique_values)
 
 # First Page
+
 def main_page():
     st.title("Data Overview")
 
@@ -80,28 +85,29 @@ def main_page():
     unique_purpose, x = find_unique_values(df_nuke, 'purpose')
 
     # Assign colors to each purpose for map markers and legend
-    color_map = {'Wr': 'green',
-        'We': 'darkpurple',
-        'Combat': 'darkred',
-        'Pne': 'pink',
-        'Se': 'blue',
-        'Fms': 'black',
-        'Pne:Plo': 'orange',
-        'Sam': 'cadetblue',
-        'Wr/Se': 'white',
-        'Others': 'gray'}
+    color_map = {
+                'Wr': 'green',
+                'We': 'darkpurple',
+                'Combat': 'darkred',
+                'Pne': 'pink',
+                'Se': 'blue',
+                'Fms': 'black',
+                'Pne:Plo': 'orange',
+                'Sam': 'cadetblue',
+                'Wr/Se': 'white',
+                'Others': 'gray'}
     # [PY5, accessed for map markers and legend below]
 
     # Slider for year filter, used for map and time series chart
-    min_year = int(df_nuke['year'].min())
+    min_year = int(df_nuke['year'].min())  # [DA9 - calculations on DF columns]
     max_year = int(df_nuke['year'].max())
-    selected_year = st.slider("Show explosions for range:", min_year, max_year, (min_year, max_year)) # [ST1, slider]
+    selected_year = st.slider("Show explosions for range:", min_year, max_year, (min_year, max_year))  # [ST1, slider]
 
     # Filters explosions by selected year range and only those in range show on map
-    filtered_explosions = df_nuke[(df_nuke['year'] >= selected_year[0]) & (df_nuke['year'] <= selected_year[1])] # [DA4]
+    filtered_explosions = df_nuke[(df_nuke['year'] >= selected_year[0]) & (df_nuke['year'] <= selected_year[1])]  # [DA4]
 
     # Relevant content to display on each marker
-    unique_locations = filtered_explosions[['latitude', 'longitude', 'location', 'day', 'month', 'year', 'magnitude_body','magnitude_surface', 'purpose']].drop_duplicates()
+    unique_locations = filtered_explosions[['latitude', 'longitude', 'location', 'day', 'month', 'year', 'magnitude_body', 'magnitude_surface', 'purpose']].drop_duplicates()
 
     # Creates folium map, taken from class example
     m = folium.Map(location=[unique_locations['latitude'].mean(), unique_locations['longitude'].mean()],
@@ -121,10 +127,10 @@ def main_page():
 
     # Allows user to toggle map on or off to reduce clutter
     if st.checkbox("Show Map"):
-        st_folium(m, width=1000) # [VIZ4]
+        st_folium(m, width=1000)  # [VIZ4]
 
         # Legend for marker colors
-        with st.expander("Click to expand legend for purpose colors on map"): # [ST2, drop down / expander]
+        with st.expander("Click to expand legend for purpose colors on map"):  # [ST2, drop down / expander]
             for purpose, color in color_map.items():
                 st.write(f"<span style='color:{color}'>■</span> {purpose}", unsafe_allow_html=True)
 
@@ -137,13 +143,13 @@ def main_page():
 
     # Data parameter for time series
     filtered_explosions = df_nuke[((df_nuke['year'] >= selected_year[0]) & (df_nuke['year'] <= selected_year[1]))
-                                  & ((df_nuke['country'] == 'USA') | (df_nuke['country'] == 'USSR'))]
+                                  & ((df_nuke['country'] == 'USA') | (df_nuke['country'] == 'USSR'))]  # [DA5]
 
-    # Pairs the countries/years with the amount of occurances (.size)
+    # Pairs the countries/years with the amount of occurrences (.size)
     df_time_series = filtered_explosions.groupby(['year', 'country']).size().reset_index(name='count')
     chart, ax = plt.subplots(figsize=(10, 6))
     plot_time_series(df_time_series, 'year', 'count', 'country', ax)
-    st.subheader('Nuclear Deployments Over Time (USA v. USSR)')  # Opted for a subheader instead of cahrt title
+    st.subheader('Nuclear Deployments Over Time (USA v. USSR)')  # Opted for a subheader instead of chart title
     st.pyplot(chart)  # [VIZ2]
 
     # Isolating countries and using the dictionary for frequency / appearances
@@ -172,15 +178,15 @@ def main_page():
         plt.figure(figsize=(10, 10))
         sns.set_palette("pastel")
         #  Explode the overlapping entries out from other entries
-        explode = [0.15 if country == 'PAKIST' else .3 if country == "INDIA" else .1 if country == "UK" else .015 for country in countries_table.index] # [Explode idea from Chat GPT, see Docs]
+        explode = [0.15 if country == 'PAKIST' else .3 if country == "INDIA" else .1 if country == "UK" else .015 for country in countries_table.index]  # [Explode idea from ChatGPT, see Docs]
         plt.pie(countries_table['Deployment Count'], labels=countries_table.index, autopct='%1.2f%%', startangle=90, explode=explode)
-        plt.axis('equal') # For scaling
+        plt.axis('equal')  # For scaling
         st.pyplot()  # [VIZ1]
 
     st.subheader('Nuclear Deployments Per Country')
     st.table(countries_table)
 
-    # Open and close pie chart with button, I wanted text to change depending on st.session state, but...
+    # Open and close pie chart with button, I wanted text to change depending on st.session state, but couldn't figure it out
     if st.button('Open/Close Table as Pie Chart'):
         open_close()
     if st.session_state.chart:
@@ -190,14 +196,13 @@ def main_page():
     df_heatmap = df_nuke.dropna(subset=['type'])
     heat_pivot = df_heatmap.pivot_table(index='country', columns='type', aggfunc='size', fill_value=0)
 
-
-    # Displayes a Heatmap of the type occurances in data
+    # Displays a Heatmap of the type occurrences in data
     plt.figure(figsize=(10, 6))
     sns.heatmap(heat_pivot, cmap='RdPu', annot=True, fmt='d', linewidths=.5)
     plt.title('Nuclear Explosions by Type of Deployment')
     plt.xlabel('Type of Deployment')
     plt.ylabel('Country')
-    st.pyplot()
+    st.pyplot()  # [VIZ3]
 
 # Second Page
 def country_data_page():
@@ -205,7 +210,7 @@ def country_data_page():
 
     # Pulling the different countries from data
     unique_countries, x = find_unique_values(df_nuke, 'country')
-    selected_country = st.sidebar.selectbox("Display Data for:", unique_countries) # [ST3]
+    selected_country = st.sidebar.selectbox("Display Data for:", unique_countries)  # [ST3]
 
     # Displays data for selected countries
     st.subheader(f"Displaying data for: {selected_country}")
@@ -226,17 +231,17 @@ def country_data_page():
     st.write(f"Showing Top {min(num_explosions, 5)} Smallest Explosions by Yield for {selected_country}:")
     st.write(sorted_data.tail(min(num_explosions, 5)))
 
-    # Pivot tables for magnitudes
+    # Pivot tables for magnitudes [DA6]
     pivot_body = selected_country_data.pivot_table(index='country', values='magnitude_body',
-                                                    aggfunc=['mean', 'median', 'min', 'max', 'std'])
+                                                   aggfunc=['mean', 'median', 'min', 'max', 'std'])
     pivot_surface = selected_country_data.pivot_table(index='country', values='magnitude_surface',
-                                                    aggfunc=['mean', 'median', 'min', 'max', 'std'])
+                                                      aggfunc=['mean', 'median', 'min', 'max', 'std'])
 
     # Rename columns to be User-Friendly
     pivot_body.columns = ['Mean Magnitude (Body)', 'Median Magnitude (Body)', 'Minimum Magnitude (Body)',
-                           'Maximum Magnitude (Body)', 'Standard Deviation']
+                          'Maximum Magnitude (Body)', 'Standard Deviation']
     pivot_surface.columns = ['Mean Magnitude (Surface)', 'Median Magnitude (Surface)', 'Minimum Magnitude (Surface)',
-                           'Maximum Magnitude (Surface)', 'Standard Deviation']
+                             'Maximum Magnitude (Surface)', 'Standard Deviation']
 
     st.write("Summary of Explosion Magnitudes")
     st.write(pivot_body)
@@ -273,7 +278,7 @@ def make_form_page():
 
         # Allow users to select columns for the table
         st.subheader("Select Table Columns")
-        columns_without_country = [col for col in filtered.columns.tolist() if col != 'country'] # Redundant because it's the index
+        columns_without_country = [col for col in filtered.columns.tolist() if col != 'country']  # Redundant because it's the index
         selected_table_columns = st.multiselect("Select Columns:", columns_without_country)
 
 
@@ -284,13 +289,13 @@ def make_form_page():
             st.subheader(table_name)
             st.write(table)
 
-            # Allows users to export the table as an Excel sheet, called by button click
+            # Allows users to export the table as an Excel sheet, called by button click [EXTRA - Tempfile]
             def export_to_excel(table_df, table_name):
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp_file: # Creates a temporary file not deleted when closed and already in xlsx format,
-                    file_path = tmp_file.name # Gets file path
-                    writer = pd.ExcelWriter(file_path, engine="xlsxwriter") # I believe I had to pip intall the engine, writes the data into an excel sheet
-                    table_df.to_excel(writer, index=True) # set index to true so the country shows in sheet
-                info = open(file_path, "rb") #
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp_file:  # Creates a temporary file not deleted when closed and already in xlsx format,
+                    file_path = tmp_file.name  # Gets file path
+                    writer = pd.ExcelWriter(file_path, engine="xlsxwriter")  # I believe I had to pip install the engine, writes the data into an Excel sheet
+                    table_df.to_excel(writer, index=True)  # set index to true so the country shows in sheet
+                info = open(file_path, "rb")
                 file_content = info.read()
                 return file_content, file_path
 
@@ -313,7 +318,7 @@ def make_form_page():
                 frequency_column = st.selectbox("Select column for Frequency Chart:", selected_chart_columns)
                 chart_type = st.radio("Select Chart Type:", ["Line Chart", "Bar Chart"])
 
-                unique_list, unique_values = unique_data[frequency_column]
+                unique_list, unique_values = unique_data[frequency_column] # [DA7, Frequency Count + Add/select columns above]
 
                 # Make dataframe for frequency chart
                 frequency_df = pd.DataFrame({"Value": unique_list, "Frequency": [unique_values[val] for val in unique_list]})
@@ -361,7 +366,7 @@ def make_form_page():
                 elif chart_type == "Scatter Plot":
                     st.scatter_chart(filtered, x=x_axis_column, y=y_axis_column, use_container_width=True)
 
-#
+# Introduction
 def intro_page():
     with st.expander("About the Data and Site"):
         st.write("""
@@ -402,7 +407,8 @@ def intro_page():
         """)
 
 # Load selected page, main navigation
-selected_page = st.radio("Page Navigation", ["Introduction", "Data Overview", "Individual Country Data", "Customized Queries"]) # [ST4, Navigation]
+selected_page = st.radio("Page Navigation", ["Introduction", "Data Overview", "Individual Country Data", "Customized Queries"])  # [ST4, Navigation]
+
 if selected_page == "Data Overview":
     main_page()
 elif selected_page == "Individual Country Data":
