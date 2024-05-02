@@ -20,7 +20,7 @@ import seaborn as sns
 
 
 # Main DataFrame for data
-df_nuke = pd.read_csv('nuclear_explosions.csv')
+df_nuke = pd.read_csv('/Users/josiasrodriguez-ponde/Library/CloudStorage/OneDrive-BentleyUniversity/CS230/StreamLit/nuclear_explosions.csv')
 df_nuke.drop_duplicates(inplace=True)
 
 # Making column names easier to type + useable with certain functions [DA1 + drop dupes above]
@@ -293,8 +293,8 @@ def make_form_page():
             def export_to_excel(table_df, table_name):
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp_file:  # Creates a temporary file not deleted when closed and already in xlsx format,
                     file_path = tmp_file.name  # Gets file path
-                    writer = pd.ExcelWriter(file_path, engine="xlsxwriter")  # I believe I had to pip install the engine, writes the data into an Excel sheet
-                    table_df.to_excel(writer, index=True)  # set index to true so the country shows in sheet
+                    with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
+                        table_df.to_excel(writer, index=True)
                 info = open(file_path, "rb")
                 file_content = info.read()
                 return file_content, file_path
