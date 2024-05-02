@@ -20,7 +20,7 @@ import seaborn as sns
 
 
 # Main DataFrame for data
-df_nuke = pd.read_csv('/nuclear_explosions.csv')
+df_nuke = pd.read_csv('nuclear_explosions.csv')
 df_nuke.drop_duplicates(inplace=True)
 
 # Making column names easier to type + useable with certain functions [DA1 + drop dupes above]
